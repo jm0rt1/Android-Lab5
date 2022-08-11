@@ -48,27 +48,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Setup Actions
+        createNotificationChannel();
         initNavDrawer();
+        initThreadingComponents();
+        initActivityResultLauncher();
 
-        textView = (TextView) findViewById(R.id.text_view);
-        progressBar = (ProgressBar) findViewById(R.id.task_progress_bar);
-        mHandler = new Handler();
-        r = new Random();
+    }
 
+    private void initActivityResultLauncher() {
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if(result.getResultCode() == Activity.RESULT_OK)
                         {
-//                            Intent data = result.getData();
-//                            ImageView image = (ImageView) findViewById(R.id.picture);
-//                            Bitmap b = (Bitmap) data.getExtras().get("data");
-//                            image.setImageBitmap(b);
+                            Intent data = result.getData();
+                            ImageView image = (ImageView) findViewById(R.id.image_view);
+                            Bitmap b = (Bitmap) data.getExtras().get("data");
+                            image.setImageBitmap(b);
                         }
                     }
                 });
+    }
 
+    private void initThreadingComponents() {
+        textView = (TextView) findViewById(R.id.text_view);
+        progressBar = (ProgressBar) findViewById(R.id.task_progress_bar);
+        mHandler = new Handler();
+        r = new Random();
     }
 
     private void initNavDrawer() {
@@ -92,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    public void StartCount(View view)
+    public void doVeryDifficultWork(View view)
     {
 
         new Thread(new Runnable() {
@@ -116,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
 
                     try {
-                        int temp = r.nextInt(10)+1;
-                        Thread.sleep(20*temp);
+
+                        Thread.sleep(100);
                     }
                     catch (InterruptedException e)
                     {
@@ -141,7 +149,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
     }
-
+    private void createNotificationChannel()
+    {
+        //only create the notification channel on API 26+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel("alert", "name", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+    }
 
     public void sendNotification(View V){
 
